@@ -1,6 +1,8 @@
 package praktikum;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 import static praktikum.IngredientType.FILLING;
@@ -15,6 +17,9 @@ public class IngredientTest {
     private final static float PRICE = 2.0F;
 
     private Ingredient ingredient;
+
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
 
     @Test
     public void checkGetPrice() {
@@ -36,19 +41,13 @@ public class IngredientTest {
 
     @Test
     public void checkIngredientConstructorIfNameIsNull() { // Баг, не должно быть возможности передать null
-        try {
-            ingredient = new Ingredient(FILLING, null, PRICE);
-        } catch (Exception e) {
-            assertEquals("Error message", e.getMessage());
-        }
+        exceptionRule.expect(Exception.class);
+        ingredient = new Ingredient(FILLING, null, PRICE);
     }
 
     @Test
     public void checkIngredientConstructorIfTypeIsNull() { // Баг, не должно быть возможности передать null
-        try {
-            ingredient = new Ingredient(null, INGREDIENT_NAME, PRICE);
-        } catch (Exception e) {
-            assertEquals("Error message", e.getMessage());
-        }
+        exceptionRule.expect(Exception.class);
+        ingredient = new Ingredient(null, INGREDIENT_NAME, PRICE);
     }
 }

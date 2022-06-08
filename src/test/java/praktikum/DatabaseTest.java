@@ -38,11 +38,11 @@ public class DatabaseTest {
 
     @Test
     public void checkAvailableBuns() {
-        assertSame(buns.getClass(), database.availableBuns().getClass());
+        assertEquals(buns.getClass(), database.availableBuns().getClass());
     }
 
     @Test
     public void checkAvailableIngredients() {
-        assertSame(ingredients.getClass(), database.availableIngredients().getClass());
+        assertEquals(ingredients.getClass(), database.availableIngredients().getClass());
     }
 }

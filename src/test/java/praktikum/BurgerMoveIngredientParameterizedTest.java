@@ -1,13 +1,12 @@
 package praktikum;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 import static praktikum.IngredientType.SAUCE;
 
 /**
@@ -20,24 +19,25 @@ public class BurgerMoveIngredientParameterizedTest {
     private final static String INGREDIENT_NAME = "Space Workflow";
     private final static float PRICE = 2.0F;
 
-    private final List<Integer> checkedData;
-    private final String expected;
+    private final Integer indexFrom;
+    private final Integer indexTo;
     private Burger burger;
 
-    public BurgerMoveIngredientParameterizedTest(List<Integer> checkedData, String expected) {
-        this.checkedData = checkedData;
-        this.expected = expected;
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
+
+    public BurgerMoveIngredientParameterizedTest(Integer indexFrom, Integer indexTo) {
+        this.indexFrom = indexFrom;
+        this.indexTo = indexTo;
     }
 
-    @Parameterized.Parameters(name = "Test data: {0}")
+    @Parameterized.Parameters(name = "Test data: indexFrom={0}, indexTo={1}")
     public static Object[][] getData() {
         return new Object[][]{
-                {List.of(0, 0), "Test should pass"},
-                {List.of(0, 1), "Test should pass"},
-                {List.of(0, 2), "Index: 2, Size: 1"},
-                {List.of(0, -1), "Index: -1, Size: 1"},
-                {List.of(2, 0), "Index 2 out of bounds for length 2"},
-                {List.of(-1, 0), "Index -1 out of bounds for length 2"}
+                {0, 2},
+                {0, -1},
+                {2, 0},
+                {-1, 0}
         };
     }
 
@@ -50,10 +50,7 @@ public class BurgerMoveIngredientParameterizedTest {
 
     @Test
     public void checkMoveIngredientWithWrongIndex() {
-        try {
-            burger.moveIngredient(checkedData.get(0), checkedData.get(1));
-        } catch (IndexOutOfBoundsException e) {
-            assertEquals(expected, e.getMessage());
-        }
+        exceptionRule.expect(IndexOutOfBoundsException.class);
+        burger.moveIngredient(indexFrom, indexTo);
     }
 }

@@ -1,7 +1,9 @@
 package praktikum;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.junit.Assert.*;
+import static praktikum.IngredientType.FILLING;
 import static praktikum.IngredientType.SAUCE;
 
 /**
@@ -42,15 +45,18 @@ public class BurgerTest {
         burger = new Burger();
     }
 
-    public void createBunMockAndSetBunField(String name, Float price) {
+    public void createBunMockAndSetBunFields(String name, Float price) {
         Mockito.when(bun.getPrice()).thenReturn(price);
         Mockito.when(bun.getName()).thenReturn(name);
         burger.setBuns(bun);
     }
 
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
+
     @Test
     public void checkSetBuns() {
-        createBunMockAndSetBunField(NAME, PRICE);
+        createBunMockAndSetBunFields(NAME, PRICE);
         assertEquals(bun, burger.bun);
     }
 
@@ -63,12 +69,18 @@ public class BurgerTest {
 
     @Test
     public void checkAddIngredientWithNull() { // Баг, мы не должны иметь возможность добавить Null
+        exceptionRule.expect(Exception.class);
         burger.addIngredient(null);
-        try {
-            assertEquals(List.of(null), burger.ingredients);
-        } catch (Exception e) {
-            assertEquals("Cannot read the array length because \"elements\" is null", e.getMessage());
-        }
+    }
+
+    @Test
+    public void checkCorrectMovingIngredient() {
+        Ingredient first = new Ingredient(SAUCE, INGREDIENT_NAME, PRICE);
+        Ingredient second = new Ingredient(FILLING, INGREDIENT_NAME, PRICE);
+        burger.addIngredient(first);
+        burger.addIngredient(second);
+        burger.moveIngredient(0, 1);
+        assertEquals(List.of(second, first), burger.ingredients);
     }
 
     @Test
@@ -80,16 +92,14 @@ public class BurgerTest {
 
     @Test
     public void checkRemoveIngredientForEmptyIngredientList() {
-        try {
-            burger.removeIngredient(0);
-        } catch (IndexOutOfBoundsException e) {
-            assertEquals("Index 0 out of bounds for length 0", e.getMessage());
-        }
+        exceptionRule.expect(IndexOutOfBoundsException.class);
+        exceptionRule.expectMessage("Index 0 out of bounds for length 0");
+        burger.removeIngredient(0);
     }
 
     @Test
     public void checkGetPrice() {
-        createBunMockAndSetBunField(NAME, PRICE);
+        createBunMockAndSetBunFields(NAME, PRICE);
         burger.addIngredient(new Ingredient(SAUCE, INGREDIENT_NAME, PRICE));
         burger.addIngredient(new Ingredient(SAUCE, ANOTHER_INGREDIENT_NAME, PRICE));
         assertEquals(PRICE * 4, burger.getPrice(), 0);
@@ -97,7 +107,7 @@ public class BurgerTest {
 
     @Test
     public void checkGetReceipt() {
-        createBunMockAndSetBunField(NAME, PRICE);
+        createBunMockAndSetBunFields(NAME, PRICE);
         burger.addIngredient(new Ingredient(SAUCE, INGREDIENT_NAME, PRICE));
         burger.addIngredient(new Ingredient(SAUCE, ANOTHER_INGREDIENT_NAME, PRICE));
         assertEquals(

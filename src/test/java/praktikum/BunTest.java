@@ -1,7 +1,9 @@
 package praktikum;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -19,10 +21,13 @@ public class BunTest {
 
     private Bun bun;
 
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
+
     @Test
     public void checkConstructorForNameIsNull() {
-        bun = new Bun(null, PRICE);
-        assertNull(bun.getName()); //баг, мы не должны давать возможность создавать с null в имени
+        exceptionRule.expect(Exception.class);
+        bun = new Bun(null, PRICE); //баг, мы не должны давать возможность создавать с null в имени
     }
 
     @Test

@@ -1,13 +1,11 @@
 package praktikum;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static praktikum.IngredientType.FILLING;
 import static praktikum.IngredientType.SAUCE;
 
 /**
@@ -17,39 +15,32 @@ import static praktikum.IngredientType.SAUCE;
 @RunWith(Parameterized.class)
 public class IngredientConstructorParametrizedTest {
 
+    private final String name;
+    private final Float price;
 
-    private final IngredientType expectedType;
-    private final String expectedName;
-    private final float expectedPrice;
-    private final String expectedResult;
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
 
-
-    public IngredientConstructorParametrizedTest(List<Object> data, String expectedResult) {
-        this.expectedType = (IngredientType) data.get(0);
-        this.expectedName = (String) data.get(1);
-        this.expectedPrice = (Float) data.get(2);
-        this.expectedResult = expectedResult;
+    public IngredientConstructorParametrizedTest(String name, Float price) {
+        this.name = name;
+        this.price = price;
     }
 
     @Parameterized.Parameters(name = "Test data: {0}")
     public static Object[][] getData() {
         return new Object[][]{
-                {List.of(SAUCE, "", 5F), "Error message"}, // Баг, нельзя создать ингридиент с пустыми именем
-                {List.of(SAUCE, " ", 5F), "Error message"}, // Баг, нельзя создать ингридиент лишь с пробелами в имени
-                {List.of(SAUCE, "z\\xd0\\", 5F), ""}, // Уточнил бы тут
-                {List.of(SAUCE, "!№;%:?*():eagle:", 5F), ""}, // Уточнил бы тут
-                {List.of(FILLING, "Cheese", -1F), ""}, // Баг, нельзя задавать отрицательное число
+                {"", 5F}, // Баг, нельзя создать ингридиент с пустыми именем
+                {" ", 5F}, // Баг, нельзя создать ингридиент лишь с пробелами в имени
+                {"z\\xd0\\", 5F}, // Уточнил бы тут
+                {"!№;%:?*():eagle:", 5F}, // Уточнил бы тут по спецсимволам
+                {"Cheese", -1F}, // Баг, нельзя задавать отрицательное число
         };
     }
 
     @Test
     public void checkConstructorForIngredient() {
-        try {
-            new Ingredient(expectedType, expectedName, expectedPrice);
-        } catch (IndexOutOfBoundsException e) {
-            assertEquals(expectedResult, e.getMessage());
-        }
+        exceptionRule.expect(Exception.class);
+        new Ingredient(SAUCE, name, price);
     }
-
 
 }
